@@ -224,11 +224,44 @@ class NavigationHighlight {
     window.applyBHoverEffect = applyBHoverEffect;
 })();
 
+class HeroIntro {
+    constructor() {
+        this.el = document.getElementById('hero-intro');
+        if (!this.el) return;
+
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (reduceMotion) {
+            this.finish();
+            return;
+        }
+
+        document.body.classList.add('intro-active');
+
+        this.onKeydown = (event) => {
+            if (event.key === 'Escape') this.finish();
+        };
+        document.addEventListener('keydown', this.onKeydown);
+
+        this.el.addEventListener('animationend', (event) => {
+            if (event.animationName === 'hero-exit') this.finish();
+        });
+    }
+
+    finish() {
+        if (this.done) return;
+        this.done = true;
+        document.body.classList.remove('intro-active');
+        document.removeEventListener('keydown', this.onKeydown);
+        if (this.el) this.el.remove();
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     new ThemeManager();
     new MobileNavigation();
     new SmoothScroll();
     new NavigationHighlight();
+    new HeroIntro();
 
     if (typeof window.applyBHoverEffect === 'function') {
         window.applyBHoverEffect(document.body);
